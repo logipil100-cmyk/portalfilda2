@@ -1564,7 +1564,7 @@ export function useStore(): StoreContextType {
 
 // --- 5) UTILITÁRIOS ----------------------------------------------------------
 
-export function formatKZ(n: number | string): string {
+export function formatKZ(n: number | string | undefined | null): string {
   if (typeof n === "string") return n;
   return new Intl.NumberFormat("pt-AO", {
     style: "currency",
