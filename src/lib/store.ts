@@ -254,8 +254,7 @@ const SEED: DB = {
     nome: "FILDA II - Escola de Futebol",
     lema: "Onde Campeões Nascem e Crescem",
     hero: "CRESCER DISCIPLINADO E COM SAÚDE.",
-    heroImageURL:
-      "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1600&q=80",
+    heroImageURL: "",
     logoURL: "/logo-filda.svg",
     tituloQuemSomos: "CRESCER DISCIPLINADO E COM SAÚDE.",
     quemSomos:
