@@ -159,7 +159,11 @@ function Home() {
                 db.config.heroImageURL ||
                 heroFilda
               }
-              alt="Estádio e Treinamento"
+              alt="Jovens atletas em treino no campo ao pôr do sol"
+              onError={(e) => {
+                const el = e.currentTarget;
+                if (el.src !== heroFilda) el.src = heroFilda;
+              }}
               className="w-full h-full object-cover animate-kenburns"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/40" />
