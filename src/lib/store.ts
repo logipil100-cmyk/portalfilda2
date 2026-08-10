@@ -35,7 +35,7 @@ import { traduzirErroParaPortugues } from "./error-translator";
 
 // --- 1) TIPOS -----------------------------------------------------------------
 
-export type Perfil = "admin" | "secretaria" | "mister" | "pai";
+export type Perfil = "admin" | "secretaria" | "mister" | "pai" | "encarregado" | "aluno";
 
 export interface Usuario {
   id: string;
@@ -80,6 +80,7 @@ export interface Aluno {
   cartoesVermelhos?: number;
   mesesAtraso?: number;
   valorMensalidade?: number;
+  nif?: string;
   avaliacao?: {
     tecnica: number;
     tatica: number;
@@ -125,6 +126,8 @@ export interface Pagamento {
 }
 
 // Item da Galeria de Imagens do CMS
+export type GaleriaItem = ItemGaleria;
+
 export interface ItemGaleria {
   id: string;
   url: string;
@@ -148,7 +151,7 @@ export interface VideoItem {
 export interface PlanoItem {
   id: string;
   titulo: string;
-  valor: string | number;
+  valor: string;
   periodicidade: string; // ex: "Mensal", "Trimestral", "Anual"
   descricao: string;
   vantagens?: string[];
@@ -228,6 +231,7 @@ export interface DB {
   faq: FaqItem[];
   auditoria: Auditoria[];
   jogos: Jogo[];
+  anuncios: Anuncio[];
 }
 
 export function criptografarSenha(senha?: string): string {
