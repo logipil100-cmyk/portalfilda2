@@ -9,6 +9,7 @@
 // ============================================================================
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import heroFilda from "@/assets/hero-filda.jpg";
 import { useMemo, useState } from "react";
 import { useStore, formatKZ, novoId, formatarEmbedUrl, type Aluno } from "@/lib/store";
 import { mostrarAlerta } from "@/lib/dialogs";
@@ -156,7 +157,7 @@ function Home() {
             <img
               src={
                 db.config.heroImageURL ||
-                "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1600&q=80"
+                heroFilda
               }
               alt="Estádio e Treinamento"
               className="w-full h-full object-cover scale-105 animate-pulse-slow"
