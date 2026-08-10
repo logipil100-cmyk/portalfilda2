@@ -160,10 +160,10 @@ function Home() {
                 heroFilda
               }
               alt="Estádio e Treinamento"
-              className="w-full h-full object-cover scale-105 animate-pulse-slow"
+              className="w-full h-full object-cover animate-kenburns"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-black/75 to-black/60" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(11,18,32,0.8)_100%)]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-black/40" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,rgba(11,18,32,0.85)_100%)]" />
           </div>
 
           <div className="relative z-10 max-w-4xl mx-auto px-4 animate-fadeIn">
