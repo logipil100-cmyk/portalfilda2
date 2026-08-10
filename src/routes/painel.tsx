@@ -1833,7 +1833,7 @@ function enviarLembreteWhatsAppAluno(
   db: DB,
   atualizar: (
     fn: (d: DB) => void,
-    log?: { acao: string; entidade: string; detalhe: string },
+    log?: { acao: "criar" | "editar" | "apagar" | "acao"; entidade: string; detalhe: string },
   ) => void,
 ) {
   const pai = (db?.usuarios || []).find((u) => u && u.id === aluno.encarregadoId);
@@ -1886,7 +1886,7 @@ async function enviarLembreteMassaVencidos(
   db: DB,
   atualizar: (
     fn: (d: DB) => void,
-    log?: { acao: string; entidade: string; detalhe: string },
+    log?: { acao: "criar" | "editar" | "apagar" | "acao"; entidade: string; detalhe: string },
   ) => void,
 ) {
   const hojeStr = new Date().toISOString().slice(0, 10);
@@ -3265,6 +3265,10 @@ function GestaoAlunos({
       (d) => {
         d.alunos.push({
           id: novoId(),
+          estadoFisico: form.estadoFisico || "Bom",
+          estadoMedico: form.estadoMedico || "Apto",
+          lesoes: form.lesoes || "",
+          problemasRespiratorios: form.problemasRespiratorios || "Não",
           nome,
           dataNasc: form.dataNasc ?? "",
           sub: form.sub || "Sub-11",

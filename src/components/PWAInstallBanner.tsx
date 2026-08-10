@@ -36,7 +36,7 @@ export function PWAInstallBanner() {
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       // Only show if user hasn't dismissed it in this session
       const fechado = sessionStorage.getItem("pwa_banner_fechado");
       if (!fechado) {
