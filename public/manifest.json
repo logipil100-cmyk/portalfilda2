@@ -1,0 +1,40 @@
+{
+  "short_name": "FILDA II App",
+  "name": "FILDA II - Escola de Futebol App",
+  "description": "Aplicativo Oficial da FILDA II - Escola de Futebol. Gestão de atletas, pré-matrículas, carteira digital e resultados.",
+  "icons": [
+    {
+      "src": "/logo-filda.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "categories": ["sports", "education", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Pré-Matrícula",
+      "short_name": "Matrícula",
+      "description": "Fazer pré-matrícula de atleta",
+      "url": "/#matricula"
+    },
+    {
+      "name": "Ranking Top 10",
+      "short_name": "Ranking",
+      "description": "Ver ranking de atletas",
+      "url": "/#ranking"
+    },
+    {
+      "name": "Acesso à Secretaria",
+      "short_name": "Painel",
+      "description": "Entrar no painel de gestão",
+      "url": "/painel"
+    }
+  ]
+}
