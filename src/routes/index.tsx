@@ -156,8 +156,9 @@ function Home() {
           <div className="absolute inset-0 z-0">
             <img
               src={
-                db.config.heroImageURL ||
-                heroFilda
+                db.config.heroImageURL && !db.config.heroImageURL.includes("unsplash.com")
+                  ? db.config.heroImageURL
+                  : heroFilda
               }
               alt="Jovens atletas em treino no campo ao pôr do sol"
               onError={(e) => {
