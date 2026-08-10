@@ -3801,13 +3801,13 @@ function PainelMister() {
   function somarPontos(alunoId: string, delta: number) {
     atualizar((d) => {
       const a = d.alunos.find((x) => x.id === alunoId);
-      if (a) a.pontos = Math.max(0, a.pontos + delta);
+      if (a) a.pontos = Math.max(0, (a.pontos ?? 0) + delta);
     });
   }
   function marcarFalta(alunoId: string, delta = 1) {
     atualizar((d) => {
       const a = d.alunos.find((x) => x.id === alunoId);
-      if (a) a.faltas = Math.max(0, a.faltas + delta);
+      if (a) a.faltas = Math.max(0, (a.faltas ?? 0) + delta);
     });
   }
 
@@ -3834,7 +3834,7 @@ function PainelMister() {
     atualizar((d) => {
       alunosDaTurma.forEach((a) => {
         const al = d.alunos.find((x) => x.id === a.id);
-        if (al) al.pontos = Math.max(0, al.pontos + delta);
+        if (al) al.pontos = Math.max(0, (al.pontos ?? 0) + delta);
       });
     });
   }
@@ -3869,15 +3869,15 @@ function PainelMister() {
   const alertasFaltas = useMemo(
     () =>
       [...db.alunos]
-        .filter((a) => a.faltas > 0)
-        .sort((a, b) => b.faltas - a.faltas)
+        .filter((a) => (a.faltas ?? 0) > 0)
+        .sort((a, b) => (b.faltas ?? 0) - (a.faltas ?? 0))
         .slice(0, 6),
     [db.alunos],
   );
   const mediaPontos = useMemo(
     () =>
       db.alunos.length > 0
-        ? Math.round(db.alunos.reduce((acc, a) => acc + a.pontos, 0) / db.alunos.length)
+        ? Math.round(db.alunos.reduce((acc, a) => acc + (a.pontos ?? 0), 0) / db.alunos.length)
         : 0,
     [db.alunos],
   );
@@ -3997,7 +3997,7 @@ function PainelMister() {
                       ⚽ {a.pontos} pts
                     </span>
                     <span
-                      className={`text-xs px-2.5 py-1 rounded-lg ${a.faltas > 0 ? "bg-red-500/10 text-red-400 border border-red-500/20 font-semibold" : "text-white/50"}`}
+                      className={`text-xs px-2.5 py-1 rounded-lg ${(a.faltas ?? 0) > 0 ? "bg-red-500/10 text-red-400 border border-red-500/20 font-semibold" : "text-white/50"}`}
                     >
                       Faltas: {a.faltas}
                     </span>
@@ -4218,7 +4218,7 @@ function PainelMister() {
             <div className="grid md:grid-cols-3 gap-3 mt-3">
               {db.categorias.map((c) => {
                 const als = db.alunos.filter((a) => a.categoriaId === c.id);
-                const pts = als.reduce((s, a) => s + a.pontos, 0);
+                const pts = als.reduce((s, a) => s + (a.pontos ?? 0), 0);
                 return (
                   <div key={c.id} className="p-3 rounded-xl bg-black/40 border border-white/10">
                     <h4 className="font-anton text-dourado text-base">{c.nome}</h4>
@@ -4301,8 +4301,8 @@ function PainelPai() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-sm">
-                  <Mini label="Pontos" valor={a.pontos} />
-                  <Mini label="Faltas" valor={a.faltas} />
+                  <Mini label="Pontos" valor={a.pontos ?? 0} />
+                  <Mini label="Faltas" valor={a.faltas ?? 0} />
                   <Mini label="Cartões 🟨" valor={a.cartoesAmarelos || 0} />
                   <Mini label="Cartões 🟥" valor={a.cartoesVermelhos || 0} />
                   <Mini label="Mensalidade" valor={formatKZ(a.valorMensalidade)} />

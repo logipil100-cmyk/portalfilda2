@@ -145,6 +145,7 @@ export interface VideoItem {
   url: string;
   embedUrl?: string;
   descricao: string;
+  dataPublicacao?: string;
 }
 
 // Item de Plano e Preço do CMS
@@ -164,6 +165,7 @@ export interface FaqItem {
   pergunta: string;
   resposta: string;
   ativo: boolean;
+  categoria?: string;
 }
 
 // Anúncios / Avisos da Secretaria aos Pais (com visualização única para poupar espaço no Firebase)
@@ -1566,11 +1568,12 @@ export function useStore(): StoreContextType {
 
 export function formatKZ(n: number | string | undefined | null): string {
   if (typeof n === "string") return n;
+  const valor = typeof n === "number" ? n : 0;
   return new Intl.NumberFormat("pt-AO", {
     style: "currency",
     currency: "AOA",
     maximumFractionDigits: 0,
-  }).format(n);
+  }).format(valor);
 }
 
 export function formatarEmbedUrl(url: string): string {
