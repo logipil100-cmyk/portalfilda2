@@ -1253,7 +1253,7 @@ function GestaoConfig() {
   const setCampo = (campo: keyof typeof c, novo: string, num = false) =>
     atualizar(
       (d) => {
-        (d.config as Record<string, string | number>)[campo] = num ? Number(novo) || 0 : novo;
+        (d.config as unknown as Record<string, string | number>)[campo] = num ? Number(novo) || 0 : novo;
       },
       {
         acao: "editar",

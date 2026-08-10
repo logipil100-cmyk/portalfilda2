@@ -15,7 +15,8 @@ export function setDialogListeners(c: ConfirmListener | null, a: AlertListener |
   alertListener = a;
 }
 
-export function pedirConfirmacao(mensagem: string): Promise<boolean> {
+export function pedirConfirmacao(titulo: string, texto?: string): Promise<boolean> {
+  const mensagem = texto ? `${titulo}\n\n${texto}` : titulo;
   return new Promise((resolve) => {
     if (confirmListener) {
       confirmListener(mensagem, resolve);
@@ -27,10 +28,11 @@ export function pedirConfirmacao(mensagem: string): Promise<boolean> {
   });
 }
 
-export function mostrarAlerta(mensagem: unknown): Promise<void> {
+export function mostrarAlerta(mensagem: unknown, texto?: string): Promise<void> {
+  const bruto = texto ? `${String(mensagem)}\n\n${texto}` : mensagem;
   const msgFormatada = traduzirErroParaPortugues(
-    mensagem,
-    typeof mensagem === "string" ? mensagem : "Aviso do sistema.",
+    bruto,
+    typeof bruto === "string" ? bruto : "Aviso do sistema.",
   );
   return new Promise((resolve) => {
     if (alertListener) {
