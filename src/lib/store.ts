@@ -1,3 +1,6 @@
+import fildaEquipa from "@/assets/filda-equipa.png.asset.json";
+import fildaAtletaAgua from "@/assets/filda-atleta-agua.jpg.asset.json";
+import fildaAtletaForca from "@/assets/filda-atleta-forca.jpg.asset.json";
 /*
  * Este produto/código é de propriedade intelectual exclusiva de José Jacinto, criador e desenvolvedor do projeto. É estritamente proibida a cópia, venda, redistribuição ou alteração sem a autorização prévia por escrito de José Jacinto.
  */
@@ -747,27 +750,27 @@ const SEED: DB = {
   galeria: [
     {
       id: "g1",
-      url: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=600&q=80",
-      titulo: "Treino Tático Sub-13",
-      legenda: "Foco em transição rápida e compactação defensiva no campo principal.",
+      url: fildaEquipa.url,
+      titulo: "Família FILDA II",
+      legenda: "Toda a equipa reunida no campo: atletas, treinadores e comissão técnica.",
       categoria: "Treinos",
       data: "2026-07-15",
       visibilidade: "publico",
     },
     {
       id: "g2",
-      url: "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=600&q=80",
-      titulo: "Amistoso Interestadual",
-      legenda: "Nossa equipe demonstrando raça, união e fair-play em partida amistosa.",
+      url: fildaAtletaForca.url,
+      titulo: "Garra e Atitude",
+      legenda: "Determinação dos nossos atletas antes de entrar em campo.",
       categoria: "Jogos",
       data: "2026-07-18",
       visibilidade: "publico",
     },
     {
       id: "g3",
-      url: "https://images.unsplash.com/photo-1459865264687-595d652de67e?auto=format&fit=crop&w=600&q=80",
-      titulo: "Aquecimento Físico e Coordenação",
-      legenda: "Trabalho de agilidade e controle de bola orientado pela nossa comissão técnica.",
+      url: fildaAtletaAgua.url,
+      titulo: "Hidratação e Saúde",
+      legenda: "Crescer disciplinado e com saúde começa nos cuidados básicos do dia a dia.",
       categoria: "Treinos",
       data: "2026-07-20",
       visibilidade: "publico",
