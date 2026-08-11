@@ -10,6 +10,7 @@
 
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import heroFilda from "@/assets/hero-filda.jpg";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { useMemo, useState } from "react";
 import { useStore, formatKZ, novoId, formatarEmbedUrl, type Aluno } from "@/lib/store";
 import { mostrarAlerta } from "@/lib/dialogs";
@@ -195,7 +196,9 @@ function Home() {
               >
                 Conhecer Planos
               </a>
+              <PWAInstallButton className="px-8 py-4 !text-base" />
             </div>
+
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-3xl mx-auto pt-10 border-t border-white/10">
               <div className="text-center">

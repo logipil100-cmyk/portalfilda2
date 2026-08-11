@@ -5,6 +5,7 @@
 import React from "react";
 import { Bell, Smartphone, Sparkles, QrCode, Shield, LogIn, CheckCircle2 } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 
 interface MobileAppHeaderProps {
   onAbrirCarteira: () => void;
@@ -66,8 +67,12 @@ export function MobileAppHeader({
           <span>{modoApp ? "Modo Web" : "Modo App"}</span>
         </button>
 
+        {/* Baixar Aplicativo */}
+        <PWAInstallButton variant="compact" />
+
         {/* Carteira Button */}
         <button
+
           onClick={onAbrirCarteira}
           type="button"
           className="p-2 rounded-xl bg-white/5 border border-white/10 hover:border-dourado/40 text-dourado transition-all active:scale-95"
