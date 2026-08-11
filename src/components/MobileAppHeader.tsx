@@ -5,6 +5,7 @@
 import React from "react";
 import { Bell, Smartphone, Sparkles, QrCode, Shield, LogIn, CheckCircle2 } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 
 interface MobileAppHeaderProps {
   onAbrirCarteira: () => void;
