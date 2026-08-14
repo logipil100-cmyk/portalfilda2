@@ -1,0 +1,93 @@
+rules_version = '2';
+
+// ============================================================================
+//  FILDA II — Regras de segurança do Cloud Firestore
+//  Perfis: admin | secretaria | mister | pai
+//  Os perfis vivem em /papeis/{uid} { perfil: "admin" } e são geridos por um
+//  administrador (nunca pelo próprio utilizador).
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    function perfil() {
+      return autenticado() && exists(/databases/$(database)/documents/papeis/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/papeis/$(request.auth.uid)).data.perfil
+        : "visitante";
+    }
+
+    function ehAdmin()       { return perfil() == "admin"; }
+    function ehSecretaria()  { return perfil() == "secretaria"; }
+    function ehMister()      { return perfil() == "mister"; }
+    function ehStaff()       { return ehAdmin() || ehSecretaria() || ehMister(); }
+
+    // Papéis: cada utilizador lê o seu; só o admin escreve.
+    match /papeis/{uid} {
+      allow read: if autenticado() && (request.auth.uid == uid || ehStaff());
+      allow write: if ehAdmin();
+    }
+
+    // Documento central do portal (conteúdo público do site + gestão).
+    // Leitura pública (site institucional). Escrita restrita:
+    //  - staff escreve tudo;
+    //  - um visitante autenticado só pode submeter pré-matrícula, ou seja,
+    //    alterar exclusivamente o campo "alunos" (nunca configurações,
+    //    utilizadores, pagamentos, auditoria, etc.).
+    match /escola/dados {
+      allow read: if true;
+      allow write: if ehStaff()
+        || (autenticado()
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['alunos', 'notificacoes']));
+      allow create: if ehStaff();
+      allow delete: if ehAdmin();
+    }
+
+    // Galeria por documento (modelo alvo, já suportado pelas regras).
+    match /galeria/{itemId} {
+      allow read: if resource.data.visibilidade == 'publico' || ehStaff();
+      allow create, update: if ehAdmin() || ehSecretaria();
+      allow delete: if ehAdmin();
+    }
+
+    // Pré-matrículas submetidas pelo público (apenas criação).
+    match /prematriculas/{id} {
+      allow create: if autenticado()
+        && request.resource.data.nome is string
+        && request.resource.data.nome.size() > 2;
+      allow read, update: if ehStaff();
+      allow delete: if ehAdmin();
+    }
+
+    // Presenças e avaliações desportivas: mister + admin.
+    match /presencas/{id} {
+      allow read: if ehStaff();
+      allow write: if ehMister() || ehAdmin();
+    }
+    match /avaliacoes/{id} {
+      allow read: if ehStaff();
+      allow write: if ehMister() || ehAdmin();
+    }
+
+    // Conteúdo público de leitura livre, escrita administrativa.
+    match /noticias/{id}   { allow read: if true; allow write: if ehAdmin() || ehSecretaria(); }
+    match /eventos/{id}    { allow read: if true; allow write: if ehAdmin() || ehSecretaria(); }
+    match /avisos/{id}     { allow read: if true; allow write: if ehAdmin() || ehSecretaria(); }
+    match /configuracoes/{id} { allow read: if true; allow write: if ehAdmin(); }
+
+    // Dados privados de responsáveis: cada um lê apenas o seu.
+    match /responsaveis/{uid} {
+      allow read, update: if autenticado() && (request.auth.uid == uid || ehStaff());
+      allow create, delete: if ehAdmin() || ehSecretaria();
+    }
+
+    // Nada mais é acessível por omissão.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,58 @@
+rules_version = '2';
+
+// ============================================================================
+//  FILDA II — Regras de segurança do Firebase Cloud Storage
+//  Visitantes: apenas leitura das imagens públicas.
+//  Upload/alteração/remoção: apenas admin e secretaria.
+// ============================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function autenticado() { return request.auth != null; }
+
+    function perfil() {
+      return autenticado()
+        && firestore.exists(/databases/(default)/documents/papeis/$(request.auth.uid))
+        ? firestore.get(/databases/(default)/documents/papeis/$(request.auth.uid)).data.perfil
+        : "visitante";
+    }
+
+    function ehAdmin()      { return perfil() == "admin"; }
+    function ehSecretaria() { return perfil() == "secretaria"; }
+    function podeGerir()    { return ehAdmin() || ehSecretaria(); }
+
+    function imagemValida() {
+      return request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|jpg|png|webp)');
+    }
+
+    // Galeria, notícias, eventos, atletas e configuração do site
+    match /galeria/{ficheiro} {
+      allow read: if true;
+      allow write: if podeGerir() && imagemValida();
+      allow delete: if podeGerir();
+    }
+    match /noticias/{ficheiro} {
+      allow read: if true;
+      allow write: if podeGerir() && imagemValida();
+    }
+    match /eventos/{ficheiro} {
+      allow read: if true;
+      allow write: if podeGerir() && imagemValida();
+    }
+    match /config/{ficheiro} {
+      allow read: if true;
+      allow write: if ehAdmin() && imagemValida();
+    }
+    match /atletas/{ficheiro} {
+      allow read: if autenticado();
+      allow write: if podeGerir() && imagemValida();
+    }
+
+    // Tudo o resto está bloqueado.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
