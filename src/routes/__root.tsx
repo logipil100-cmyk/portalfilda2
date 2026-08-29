@@ -20,6 +20,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { useStore, StoreProvider } from "../lib/store";
 import { DialogManager } from "../components/DialogManager";
+import { AvisoNovaVersao } from "../components/AvisoNovaVersao";
 import appCss from "../styles.css?url";
 
 // Componente mostrado quando a rota não existe (404)
@@ -170,6 +171,7 @@ function RootComponent() {
       <StoreProvider>
         <Outlet />
         <DialogManager />
+        <AvisoNovaVersao />
         <BotaoSuporteWhatsApp />
       </StoreProvider>
     </QueryClientProvider>
