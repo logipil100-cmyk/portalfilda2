@@ -13,6 +13,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { pedirConfirmacao, mostrarAlerta } from "@/lib/dialogs";
+import { UploadImagem } from "@/components/UploadImagem";
+import { apagarImagem } from "@/lib/storage";
 import {
   useStore,
   formatKZ,
@@ -4791,10 +4793,12 @@ function GestaoCMS() {
           id: novoId(),
           titulo: galeriaForm.titulo!,
           url: galeriaForm.url!,
+          storagePath: galeriaForm.storagePath || "",
           categoria: galeriaForm.categoria || "Geral",
           legenda: galeriaForm.legenda || "",
           data: new Date().toISOString().slice(0, 10),
           visibilidade: galeriaForm.visibilidade || "publico",
+          updatedAt: new Date().toISOString(),
         });
       },
       {
@@ -4807,6 +4811,7 @@ function GestaoCMS() {
       visibilidade: "publico",
       categoria: "Treinos",
       url: "",
+      storagePath: "",
       titulo: "",
       legenda: "",
     });
@@ -4824,9 +4829,11 @@ function GestaoCMS() {
         if (item) {
           item.titulo = galeriaEditForm.titulo!;
           item.url = galeriaEditForm.url!;
+          item.storagePath = galeriaEditForm.storagePath || item.storagePath || "";
           item.categoria = galeriaEditForm.categoria || "Geral";
           item.legenda = galeriaEditForm.legenda || "";
           item.visibilidade = galeriaEditForm.visibilidade || "publico";
+          item.updatedAt = new Date().toISOString();
         }
       },
       {
@@ -5289,8 +5296,15 @@ function GestaoCMS() {
                 onChange={(e) => setGaleriaForm({ ...galeriaForm, titulo: e.target.value })}
                 className="input w-full bg-black/40 text-xs"
               />
+              <UploadImagem
+                pasta="galeria"
+                previa={galeriaForm.url || ""}
+                onConcluido={({ url, storagePath }) =>
+                  setGaleriaForm((f) => ({ ...f, url, storagePath }))
+                }
+              />
               <input
-                placeholder="URL da Imagem (Ex: https://...)"
+                placeholder="Ou cole aqui uma URL de imagem (opcional)"
                 value={galeriaForm.url || ""}
                 onChange={(e) => setGaleriaForm({ ...galeriaForm, url: e.target.value })}
                 className="input w-full bg-black/40 text-xs"
@@ -5352,6 +5366,14 @@ function GestaoCMS() {
                           setGaleriaEditForm({ ...galeriaEditForm, titulo: e.target.value })
                         }
                         className="input w-full bg-black/60 text-xs font-bold text-white"
+                      />
+                      <UploadImagem
+                        pasta="galeria"
+                        label="Substituir imagem"
+                        previa={galeriaEditForm.url || ""}
+                        onConcluido={({ url, storagePath }) =>
+                          setGaleriaEditForm((f) => ({ ...f, url, storagePath }))
+                        }
                       />
                       <input
                         placeholder="URL da Imagem"
@@ -5445,6 +5467,7 @@ function GestaoCMS() {
                           setGaleriaEditForm({
                             titulo: g.titulo,
                             url: g.url,
+                            storagePath: g.storagePath,
                             categoria: g.categoria,
                             legenda: g.legenda,
                             visibilidade: g.visibilidade,
@@ -5471,6 +5494,7 @@ function GestaoCMS() {
                       <button
                         onClick={async () => {
                           if (await pedirConfirmacao(`Excluir imagem "${g.titulo}"?`)) {
+                            await apagarImagem(g.storagePath);
                             atualizar(
                               (d) => {
                                 d.galeria = d.galeria.filter((x) => x.id !== g.id);
