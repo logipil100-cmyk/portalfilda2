@@ -7,7 +7,7 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 // Fora do build da Lovable (ex.: Vercel), respeita NITRO_PRESET (ex.: "vercel").
-const presetExterno = process.env["NITRO_PRESET"];
+const presetExterno = process.env["NITRO_PRESET"] || (process.env["NETLIFY"] ? "netlify" : undefined);
 
 export default defineConfig({
   tanstackStart: {

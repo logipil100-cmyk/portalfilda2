@@ -79,7 +79,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Formando atletas de alto rendimento e cidadãos exemplares. Faça já a sua pré-matrícula.",
+          "Crescer disciplinado e com saúde. Faça já a sua pré-matrícula na FILDA II.",
       },
     ],
   }),

@@ -90,7 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Formando atletas de alto rendimento e cidadãos exemplares. Faça já a sua pré-matrícula.",
+          "Crescer disciplinado e com saúde. Faça já a sua pré-matrícula na FILDA II.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
