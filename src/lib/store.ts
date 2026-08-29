@@ -33,7 +33,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { dbFirestore, auth, googleProvider } from "./firebase";
+import { dbFirestore, auth, googleProvider, garantirSessaoFirebase } from "./firebase";
 import { traduzirErroParaPortugues } from "./error-translator";
 
 // --- 1) TIPOS -----------------------------------------------------------------
@@ -134,11 +134,15 @@ export type GaleriaItem = ItemGaleria;
 export interface ItemGaleria {
   id: string;
   url: string;
+  /** Caminho do ficheiro no Firebase Storage (para poder apagar sem deixar órfãos) */
+  storagePath?: string;
   titulo: string;
   legenda?: string;
   categoria?: string;
   data: string;
   visibilidade: "publico" | "privado";
+  createdBy?: string;
+  updatedAt?: string;
 }
 
 // Item de Vídeo do CMS
@@ -1270,6 +1274,9 @@ function useStoreInternal() {
         localStorage.removeItem(CHAVE_SESSAO);
       }
     }
+
+    // Garante sessão Firebase (necessária para as regras de segurança)
+    garantirSessaoFirebase();
 
     // Sincroniza em tempo real com o Firebase Firestore (Apenas 1 conexão global!)
     try {
