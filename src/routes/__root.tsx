@@ -20,6 +20,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { useStore, StoreProvider } from "../lib/store";
 import { DialogManager } from "../components/DialogManager";
+import { AvisoNovaVersao } from "../components/AvisoNovaVersao";
 import appCss from "../styles.css?url";
 
 // Componente mostrado quando a rota não existe (404)
@@ -89,7 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "Formando atletas de alto rendimento e cidadãos exemplares. Faça já a sua pré-matrícula.",
+          "Crescer disciplinado e com saúde. Faça já a sua pré-matrícula na FILDA II.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -170,6 +171,7 @@ function RootComponent() {
       <StoreProvider>
         <Outlet />
         <DialogManager />
+        <AvisoNovaVersao />
         <BotaoSuporteWhatsApp />
       </StoreProvider>
     </QueryClientProvider>
