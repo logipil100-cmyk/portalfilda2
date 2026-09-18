@@ -1234,15 +1234,17 @@ function carregarDB(): DB {
   }
 }
 
+/** Último estado enviado/recebido da nuvem, usado para gravar só o que muda. */
+let ultimoPersistido: DB | null = null;
+
 function gravarDB(db: DB) {
   if (typeof window === "undefined") return;
-  const dbLimpo = JSON.parse(JSON.stringify(db));
+  const dbLimpo = JSON.parse(JSON.stringify(db)) as DB;
   localStorage.setItem(CHAVE, JSON.stringify(dbLimpo));
   try {
-    const docRef = doc(dbFirestore, "escola", "dados");
-    setDoc(docRef, dbLimpo).catch((err) =>
-      console.error("Erro ao sincronizar com Firestore:", err),
-    );
+    const anterior = ultimoPersistido;
+    ultimoPersistido = dbLimpo;
+    void gravarDiferencas(anterior, dbLimpo);
   } catch (err) {
     console.error("Erro ao iniciar gravação no Firestore:", err);
   }
@@ -1278,43 +1280,39 @@ function useStoreInternal() {
     // Garante sessão Firebase (necessária para as regras de segurança)
     garantirSessaoFirebase();
 
-    // Sincroniza em tempo real com o Firebase Firestore (Apenas 1 conexão global!)
+    // Sincroniza em tempo real com o Firestore (coleções separadas por entidade)
     try {
-      const docRef = doc(dbFirestore, "escola", "dados");
-      const unsubscribe = onSnapshot(
-        docRef,
-        (docSnap) => {
-          if (docSnap.exists()) {
-            const dadosNuvem = docSnap.data() as DB;
-            if (!dadosNuvem.config) dadosNuvem.config = dadosCarregados.config;
-            const { db: dbNorm } = normalizarDB(dadosNuvem);
-            localStorage.setItem(CHAVE, JSON.stringify(dbNorm));
-            setDb(dbNorm);
+      void migrarParaColecoes(dadosCarregados);
 
-            // Atualiza sessão em tempo real se os dados do utilizador atual mudaram na nuvem
-            const sessStr = localStorage.getItem(CHAVE_SESSAO);
-            if (sessStr) {
-              try {
-                const uSess = JSON.parse(sessStr) as Usuario;
-                const uNuvem = dbNorm.usuarios.find((u) => u.id === uSess.id);
-                if (
-                  uNuvem &&
-                  (uNuvem.nome !== uSess.nome ||
-                    uNuvem.user !== uSess.user ||
-                    uNuvem.senha !== uSess.senha ||
-                    uNuvem.perfil !== uSess.perfil ||
-                    uNuvem.status !== uSess.status)
-                ) {
-                  localStorage.setItem(CHAVE_SESSAO, JSON.stringify(uNuvem));
-                  setUsuario(uNuvem);
-                }
-              } catch (err) {
-                console.warn("Falha ao atualizar sessão em tempo real:", err);
+      const unsubscribe = subscreverColecoes(
+        dadosCarregados,
+        (dadosNuvem) => {
+          if (!dadosNuvem.config) dadosNuvem.config = dadosCarregados.config;
+          const { db: dbNorm } = normalizarDB(dadosNuvem);
+          ultimoPersistido = JSON.parse(JSON.stringify(dbNorm)) as DB;
+          localStorage.setItem(CHAVE, JSON.stringify(dbNorm));
+          setDb(dbNorm);
+
+          // Atualiza sessão em tempo real se os dados do utilizador atual mudaram na nuvem
+          const sessStr = localStorage.getItem(CHAVE_SESSAO);
+          if (sessStr) {
+            try {
+              const uSess = JSON.parse(sessStr) as Usuario;
+              const uNuvem = dbNorm.usuarios.find((u) => u.id === uSess.id);
+              if (
+                uNuvem &&
+                (uNuvem.nome !== uSess.nome ||
+                  uNuvem.user !== uSess.user ||
+                  uNuvem.senha !== uSess.senha ||
+                  uNuvem.perfil !== uSess.perfil ||
+                  uNuvem.status !== uSess.status)
+              ) {
+                localStorage.setItem(CHAVE_SESSAO, JSON.stringify(uNuvem));
+                setUsuario(uNuvem);
               }
+            } catch (err) {
+              console.warn("Falha ao atualizar sessão em tempo real:", err);
             }
-          } else {
-            // Se ainda não existir no Firestore, grava o estado inicial no banco de dados na nuvem
-            setDoc(docRef, dadosCarregados).catch(() => {});
           }
         },
         (err) => {
