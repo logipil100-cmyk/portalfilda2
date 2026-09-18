@@ -37,7 +37,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
-import { dbFirestore, auth, googleProvider, garantirSessaoFirebase } from "./firebase";
+import { auth, googleProvider, garantirSessaoFirebase } from "./firebase";
 import { traduzirErroParaPortugues } from "./error-translator";
 
 // --- 1) TIPOS -----------------------------------------------------------------
