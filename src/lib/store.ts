@@ -25,7 +25,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import {
+  gravarDiferencas,
+  migrarParaColecoes,
+  subscreverColecoes,
+} from "./firestore-colecoes";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
