@@ -27,7 +27,6 @@ import {
 } from "react";
 import {
   gravarDiferencas,
-  migrarParaColecoes,
   subscreverColecoes,
 } from "./firestore-colecoes";
 import {
@@ -1286,7 +1285,6 @@ function useStoreInternal() {
 
     // Sincroniza em tempo real com o Firestore (coleções separadas por entidade)
     try {
-      void migrarParaColecoes(dadosCarregados);
 
       const unsubscribe = subscreverColecoes(
         dadosCarregados,
