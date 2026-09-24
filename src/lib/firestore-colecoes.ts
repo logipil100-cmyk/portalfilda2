@@ -25,7 +25,33 @@ import {
   setDoc,
   writeBatch,
 } from "firebase/firestore";
-import { dbFirestore } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { dbFirestore, auth } from "./firebase";
+
+type Perfil = "admin" | "secretaria" | "mister" | "pai" | "visitante";
+
+const PUBLICAS: ChaveListaExt[] = ["galeria", "videos", "planos", "faq", "categorias", "jogos", "anuncios"];
+type ChaveListaExt = Exclude<keyof DB, "config">;
+
+export function colecoesPermitidas(perfil: Perfil): ChaveListaExt[] {
+  const lista = [...PUBLICAS];
+  if (perfil === "admin" || perfil === "secretaria" || perfil === "mister") lista.push("alunos", "usuarios");
+  if (perfil === "admin" || perfil === "secretaria") lista.push("pagamentos");
+  if (perfil === "admin") lista.push("auditoria");
+  return lista;
+}
+
+export async function obterPerfilAtual(): Promise<Perfil> {
+  const u = auth.currentUser;
+  if (!u || u.isAnonymous) return "visitante";
+  try {
+    const snap = await getDoc(doc(dbFirestore, "papeis", u.uid));
+    const p = snap.exists() ? (snap.data().perfil ?? snap.data().papel) : null;
+    return (["admin", "secretaria", "mister", "pai"].includes(p) ? p : "visitante") as Perfil;
+  } catch {
+    return "visitante";
+  }
+}
 import type { DB, ConfigEscola } from "./store";
 
 type ChaveLista = Exclude<keyof DB, "config">;
@@ -69,6 +95,7 @@ let migracaoIniciada = false;
 
 export async function migrarParaColecoes(dbLocal: DB): Promise<void> {
   if (migracaoIniciada) return;
+  if ((await obterPerfilAtual()) !== "admin") return; // só o admin migra
   migracaoIniciada = true;
 
   try {
@@ -145,20 +172,45 @@ export function subscreverColecoes(
     ),
   );
 
-  for (const nome of COLECOES) {
-    cancelar.push(
-      onSnapshot(
-        collection(dbFirestore, nome),
-        (snap) => {
-          (acumulado as unknown as Record<string, ComId[]>)[nome] = snap.docs.map(
-            (d) => ({ ...(d.data() as Record<string, unknown>), id: d.id }) as ComId,
-          );
-          emitir();
-        },
-        (err) => aoFalhar?.(err),
-      ),
-    );
-  }
+  let cancelarColecoes: Array<() => void> = [];
+  const pararColecoes = () => {
+    cancelarColecoes.forEach((fn) => {
+      try { fn(); } catch { /* ignora */ }
+    });
+    cancelarColecoes = [];
+  };
+
+  const subscrever = (nomes: ChaveLista[]) => {
+    pararColecoes();
+    for (const nome of nomes) {
+      cancelarColecoes.push(
+        onSnapshot(
+          collection(dbFirestore, nome),
+          (snap) => {
+            (acumulado as unknown as Record<string, ComId[]>)[nome] = snap.docs.map(
+              (d) => ({ ...(d.data() as Record<string, unknown>), id: d.id }) as ComId,
+            );
+            emitir();
+          },
+          (err) => aoFalhar?.(err),
+        ),
+      );
+    }
+  };
+
+  let chaveAtual = "";
+  cancelar.push(
+    onAuthStateChanged(auth, async () => {
+      const perfil = await obterPerfilAtual();
+      const nomes = colecoesPermitidas(perfil);
+      const chave = nomes.join(",");
+      if (chave === chaveAtual) return;
+      chaveAtual = chave;
+      subscrever(nomes);
+      if (perfil === "admin") void migrarParaColecoes(base);
+    }),
+  );
+  cancelar.push(pararColecoes);
 
   return () => {
     if (agendado) clearTimeout(agendado);
