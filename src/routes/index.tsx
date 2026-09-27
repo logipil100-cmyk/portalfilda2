@@ -1425,12 +1425,48 @@ function FaqRow({ pergunta, resposta }: { pergunta: string; resposta: string }) 
 }
 
 function ModalLogin({ onClose }: { onClose: () => void }) {
-  const { login, loginWithGoogle, loginWithFirebase } = useStore();
+  const { login, loginWithGoogle, loginWithFirebase, atualizar } = useStore();
   const navigate = useNavigate();
+  const [modo, setModo] = useState<"entrar" | "criar">("entrar");
+  const [nome, setNome] = useState("");
   const [userOrSenha, setUserOrSenha] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
+
+  async function criarConta(e: React.FormEvent) {
+    e.preventDefault();
+    setErro("");
+    if (!nome.trim()) {
+      setErro("Indique o seu nome completo.");
+      return;
+    }
+    if (!userOrSenha.includes("@")) {
+      setErro("Para criar conta é necessário um e-mail válido.");
+      return;
+    }
+    if (senha.length < 6) {
+      setErro("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+    setCarregando(true);
+    const fbResult = await loginWithFirebase(userOrSenha.trim(), senha);
+    if (fbResult.ok) {
+      const nomeFinal = nome.trim();
+      atualizar((d) => {
+        const u = d.usuarios.find(
+          (x) => x.user?.toLowerCase() === userOrSenha.trim().toLowerCase(),
+        );
+        if (u) u.nome = nomeFinal;
+      });
+      setCarregando(false);
+      onClose();
+      navigate({ to: "/painel" });
+    } else {
+      setErro(fbResult.msg ?? "Não foi possível criar a conta.");
+      setCarregando(false);
+    }
+  }
 
   async function submeter(e: React.FormEvent) {
     e.preventDefault();
@@ -1483,7 +1519,7 @@ function ModalLogin({ onClose }: { onClose: () => void }) {
     >
       <form
         onClick={(e) => e.stopPropagation()}
-        onSubmit={submeter}
+        onSubmit={modo === "criar" ? criarConta : submeter}
         className="glass rounded-3xl p-7 w-full max-w-md border border-white/20 shadow-2xl space-y-6 relative text-left"
       >
         <button
@@ -1499,7 +1535,7 @@ function ModalLogin({ onClose }: { onClose: () => void }) {
             <ShieldCheck className="w-6 h-6" />
           </div>
           <h3 className="font-anton text-2xl text-dourado uppercase tracking-wide">
-            Acesso ao Painel
+            {modo === "criar" ? "Criar Conta" : "Acesso ao Painel"}
           </h3>
           <p className="text-xs text-muted-foreground mt-1 font-light">
             FILDA II - Escola de Formação
@@ -1542,9 +1578,23 @@ function ModalLogin({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="space-y-4">
+          {modo === "criar" && (
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-white/80 uppercase">
+                Nome Completo
+              </label>
+              <input
+                required
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="ex: José dos Santos"
+                className="w-full bg-black/50 border border-white/15 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-dourado transition-all"
+              />
+            </div>
+          )}
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-white/80 uppercase">
-              Utilizador / E-mail
+              {modo === "criar" ? "E-mail" : "Utilizador / E-mail"}
             </label>
             <input
               required
@@ -1576,16 +1626,33 @@ function ModalLogin({ onClose }: { onClose: () => void }) {
           </div>
         )}
 
-        <div className="pt-2">
+        <div className="pt-2 space-y-3">
           <button
             type="submit"
             disabled={carregando}
             className="w-full btn-gold py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-dourado/20 disabled:opacity-50"
           >
-            {carregando ? "A processar..." : "Acesso ao Painel"}
+            {carregando
+              ? "A processar..."
+              : modo === "criar"
+                ? "Criar a Minha Conta"
+                : "Acesso ao Painel"}
           </button>
-          <p className="text-[10px] text-center text-white/40 mt-3 font-light">
-            Contacte a secretaria para obter as suas credenciais de acesso.
+          <button
+            type="button"
+            disabled={carregando}
+            onClick={() => {
+              setModo(modo === "criar" ? "entrar" : "criar");
+              setErro("");
+            }}
+            className="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-dourado/40 text-dourado hover:bg-dourado/10 transition-all disabled:opacity-50"
+          >
+            {modo === "criar" ? "Já tenho conta — Entrar" : "Criar Conta"}
+          </button>
+          <p className="text-[10px] text-center text-white/40 mt-1 font-light">
+            {modo === "criar"
+              ? "A conta fica pendente de aprovação pela secretaria."
+              : "Contacte a secretaria para obter as suas credenciais de acesso."}
           </p>
         </div>
       </form>
