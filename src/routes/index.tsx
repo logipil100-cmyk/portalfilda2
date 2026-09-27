@@ -1425,12 +1425,48 @@ function FaqRow({ pergunta, resposta }: { pergunta: string; resposta: string }) 
 }
 
 function ModalLogin({ onClose }: { onClose: () => void }) {
-  const { login, loginWithGoogle, loginWithFirebase } = useStore();
+  const { login, loginWithGoogle, loginWithFirebase, atualizar } = useStore();
   const navigate = useNavigate();
+  const [modo, setModo] = useState<"entrar" | "criar">("entrar");
+  const [nome, setNome] = useState("");
   const [userOrSenha, setUserOrSenha] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
+
+  async function criarConta(e: React.FormEvent) {
+    e.preventDefault();
+    setErro("");
+    if (!nome.trim()) {
+      setErro("Indique o seu nome completo.");
+      return;
+    }
+    if (!userOrSenha.includes("@")) {
+      setErro("Para criar conta é necessário um e-mail válido.");
+      return;
+    }
+    if (senha.length < 6) {
+      setErro("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+    setCarregando(true);
+    const fbResult = await loginWithFirebase(userOrSenha.trim(), senha);
+    if (fbResult.ok) {
+      const nomeFinal = nome.trim();
+      atualizar((d) => {
+        const u = d.usuarios.find(
+          (x) => x.user?.toLowerCase() === userOrSenha.trim().toLowerCase(),
+        );
+        if (u) u.nome = nomeFinal;
+      });
+      setCarregando(false);
+      onClose();
+      navigate({ to: "/painel" });
+    } else {
+      setErro(fbResult.msg ?? "Não foi possível criar a conta.");
+      setCarregando(false);
+    }
+  }
 
   async function submeter(e: React.FormEvent) {
     e.preventDefault();
