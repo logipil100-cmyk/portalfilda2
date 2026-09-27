@@ -2683,6 +2683,8 @@ function GestaoJogos({
         )}
       </div>
 
+      <TabelaClassificacao jogos={jogosLista} />
+
       {jogosLista.length === 0 && (
         <div className="glass rounded-3xl p-12 text-center text-muted-foreground border border-white/10">
           Nenhum jogo ou torneio cadastrado no calendário para esta seleção.
