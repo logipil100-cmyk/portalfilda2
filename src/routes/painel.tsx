@@ -2474,6 +2474,7 @@ function GestaoJogos({
           resultado: form.resultado || "",
           convocados: form.convocados || [],
           resumo: form.resumo || "",
+          imagem: form.imagem || "",
         });
       },
       { acao: "criar", entidade: "jogo", detalhe: `Agendou jogo "${form.titulo}"` },
@@ -2745,6 +2746,23 @@ function GestaoJogos({
                   value={form.resumo ?? ""}
                   onChange={(e) => setForm({ ...form, resumo: e.target.value })}
                   className="input bg-black/50 border-white/15 text-xs w-full resize-none"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase font-semibold text-white/70 block mb-1">
+                  Imagem do Jogo / Torneio (opcional)
+                </label>
+                <UploadImagem
+                  pasta="eventos"
+                  previa={form.imagem || undefined}
+                  onConcluido={({ url }) => setForm({ ...form, imagem: url })}
+                  label="Carregar imagem do dispositivo"
+                />
+                <input
+                  placeholder="Ou cole aqui uma URL de imagem (opcional)"
+                  value={form.imagem ?? ""}
+                  onChange={(e) => setForm({ ...form, imagem: e.target.value })}
+                  className="input bg-black/50 border-white/15 text-sm w-full mt-2"
                 />
               </div>
             </div>
