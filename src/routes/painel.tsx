@@ -2474,6 +2474,7 @@ function GestaoJogos({
           resultado: form.resultado || "",
           convocados: form.convocados || [],
           resumo: form.resumo || "",
+          imagem: form.imagem || "",
         });
       },
       { acao: "criar", entidade: "jogo", detalhe: `Agendou jogo "${form.titulo}"` },
@@ -2539,6 +2540,16 @@ function GestaoJogos({
               key={j.id}
               className="glass rounded-3xl p-5 border border-white/10 space-y-4 hover:border-white/20 transition-all"
             >
+              {j.imagem && (
+                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+                  <img
+                    src={j.imagem}
+                    alt={j.titulo}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              )}
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-white/10 pb-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -2745,6 +2756,23 @@ function GestaoJogos({
                   value={form.resumo ?? ""}
                   onChange={(e) => setForm({ ...form, resumo: e.target.value })}
                   className="input bg-black/50 border-white/15 text-xs w-full resize-none"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] uppercase font-semibold text-white/70 block mb-1">
+                  Imagem do Jogo / Torneio (opcional)
+                </label>
+                <UploadImagem
+                  pasta="eventos"
+                  previa={form.imagem || undefined}
+                  onConcluido={({ url }) => setForm({ ...form, imagem: url })}
+                  label="Carregar imagem do dispositivo"
+                />
+                <input
+                  placeholder="Ou cole aqui uma URL de imagem (opcional)"
+                  value={form.imagem ?? ""}
+                  onChange={(e) => setForm({ ...form, imagem: e.target.value })}
+                  className="input bg-black/50 border-white/15 text-sm w-full mt-2"
                 />
               </div>
             </div>

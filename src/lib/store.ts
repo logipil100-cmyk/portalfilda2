@@ -109,6 +109,7 @@ export interface Jogo {
   resultado?: string;
   convocados: string[];
   resumo?: string;
+  imagem?: string;
 }
 
 export interface Categoria {
