@@ -2436,6 +2436,168 @@ function ModalAvaliacaoAtleta({ aluno, onClose }: { aluno: Aluno; onClose: () =>
   );
 }
 
+// ---------- Tabela de Classificação (calculada dos jogos concluídos) ----------
+interface LinhaClassificacao {
+  equipa: string;
+  jogos: number;
+  vitorias: number;
+  empates: number;
+  derrotas: number;
+  golosMarcados: number;
+  golosSofridos: number;
+  saldo: number;
+  pontos: number;
+}
+
+function calcularClassificacao(jogos: Jogo[]): LinhaClassificacao[] {
+  const tabela = new Map<string, LinhaClassificacao>();
+
+  function linhaDe(equipa: string): LinhaClassificacao {
+    let l = tabela.get(equipa);
+    if (!l) {
+      l = {
+        equipa,
+        jogos: 0,
+        vitorias: 0,
+        empates: 0,
+        derrotas: 0,
+        golosMarcados: 0,
+        golosSofridos: 0,
+        saldo: 0,
+        pontos: 0,
+      };
+      tabela.set(equipa, l);
+    }
+    return l;
+  }
+
+  for (const j of jogos) {
+    if (j.status !== "Concluído" || !j.resultado) continue;
+    const m = j.resultado.match(/(\d+)\s*[-–xX:]\s*(\d+)/);
+    if (!m) continue;
+    const golosFilda = parseInt(m[1], 10);
+    const golosAdv = parseInt(m[2], 10);
+    const adversario = j.adversario?.trim() || "Adversário";
+
+    const filda = linhaDe("FILDA II");
+    const adv = linhaDe(adversario);
+
+    filda.jogos++;
+    adv.jogos++;
+    filda.golosMarcados += golosFilda;
+    filda.golosSofridos += golosAdv;
+    adv.golosMarcados += golosAdv;
+    adv.golosSofridos += golosFilda;
+
+    if (golosFilda > golosAdv) {
+      filda.vitorias++;
+      filda.pontos += 3;
+      adv.derrotas++;
+    } else if (golosFilda < golosAdv) {
+      adv.vitorias++;
+      adv.pontos += 3;
+      filda.derrotas++;
+    } else {
+      filda.empates++;
+      adv.empates++;
+      filda.pontos += 1;
+      adv.pontos += 1;
+    }
+  }
+
+  for (const l of tabela.values()) {
+    l.saldo = l.golosMarcados - l.golosSofridos;
+  }
+
+  return Array.from(tabela.values()).sort(
+    (a, b) =>
+      b.pontos - a.pontos ||
+      b.saldo - a.saldo ||
+      b.golosMarcados - a.golosMarcados ||
+      a.equipa.localeCompare(b.equipa),
+  );
+}
+
+function TabelaClassificacao({ jogos }: { jogos: Jogo[] }) {
+  const linhas = calcularClassificacao(jogos);
+
+  if (linhas.length === 0) {
+    return (
+      <div className="glass rounded-3xl p-8 text-center text-muted-foreground border border-white/10 text-sm">
+        A tabela de classificação aparecerá aqui assim que existirem jogos{" "}
+        <strong>Concluídos</strong> com placar registado (ex: 2 - 1).
+      </div>
+    );
+  }
+
+  return (
+    <div className="glass rounded-3xl border border-white/10 overflow-hidden">
+      <div className="p-4 border-b border-white/10 flex items-center gap-2">
+        <Trophy className="w-5 h-5 text-dourado" />
+        <h3 className="font-anton text-lg text-dourado uppercase tracking-wide">
+          Tabela de Classificação
+        </h3>
+        <span className="text-[10px] text-muted-foreground uppercase tracking-widest ml-auto">
+          Calculada dos jogos concluídos
+        </span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="text-white/50 uppercase tracking-wider text-[10px] border-b border-white/10">
+              <th className="p-3 text-left">#</th>
+              <th className="p-3 text-left">Equipa</th>
+              <th className="p-3 text-center" title="Jogos">J</th>
+              <th className="p-3 text-center" title="Vitórias">V</th>
+              <th className="p-3 text-center" title="Empates">E</th>
+              <th className="p-3 text-center" title="Derrotas">D</th>
+              <th className="p-3 text-center" title="Golos Marcados">GM</th>
+              <th className="p-3 text-center" title="Golos Sofridos">GS</th>
+              <th className="p-3 text-center" title="Saldo de Golos">SG</th>
+              <th className="p-3 text-center" title="Pontos">Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {linhas.map((l, i) => (
+              <tr
+                key={l.equipa}
+                className={`border-b border-white/5 ${
+                  l.equipa === "FILDA II"
+                    ? "bg-dourado/10 text-dourado font-bold"
+                    : "text-white/80"
+                }`}
+              >
+                <td className="p-3">
+                  <span
+                    className={`inline-flex w-6 h-6 items-center justify-center rounded-full text-[10px] font-bold ${
+                      i === 0
+                        ? "bg-dourado text-black"
+                        : "bg-white/10 text-white/60"
+                    }`}
+                  >
+                    {i + 1}
+                  </span>
+                </td>
+                <td className="p-3 font-semibold">{l.equipa}</td>
+                <td className="p-3 text-center">{l.jogos}</td>
+                <td className="p-3 text-center text-green-400">{l.vitorias}</td>
+                <td className="p-3 text-center text-yellow-400">{l.empates}</td>
+                <td className="p-3 text-center text-red-400">{l.derrotas}</td>
+                <td className="p-3 text-center">{l.golosMarcados}</td>
+                <td className="p-3 text-center">{l.golosSofridos}</td>
+                <td className="p-3 text-center">
+                  {l.saldo > 0 ? `+${l.saldo}` : l.saldo}
+                </td>
+                <td className="p-3 text-center font-anton text-sm">{l.pontos}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ---------- Gestão de Calendário de Jogos & Convocatórias -------------------
 function GestaoJogos({
   filtroCategoria,
