@@ -2540,6 +2540,16 @@ function GestaoJogos({
               key={j.id}
               className="glass rounded-3xl p-5 border border-white/10 space-y-4 hover:border-white/20 transition-all"
             >
+              {j.imagem && (
+                <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+                  <img
+                    src={j.imagem}
+                    alt={j.titulo}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              )}
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-white/10 pb-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
