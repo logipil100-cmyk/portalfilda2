@@ -1578,9 +1578,23 @@ function ModalLogin({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="space-y-4">
+          {modo === "criar" && (
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-white/80 uppercase">
+                Nome Completo
+              </label>
+              <input
+                required
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="ex: José dos Santos"
+                className="w-full bg-black/50 border border-white/15 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-dourado transition-all"
+              />
+            </div>
+          )}
           <div className="space-y-1">
             <label className="text-[11px] font-semibold text-white/80 uppercase">
-              Utilizador / E-mail
+              {modo === "criar" ? "E-mail" : "Utilizador / E-mail"}
             </label>
             <input
               required
@@ -1612,16 +1626,33 @@ function ModalLogin({ onClose }: { onClose: () => void }) {
           </div>
         )}
 
-        <div className="pt-2">
+        <div className="pt-2 space-y-3">
           <button
             type="submit"
             disabled={carregando}
             className="w-full btn-gold py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-dourado/20 disabled:opacity-50"
           >
-            {carregando ? "A processar..." : "Acesso ao Painel"}
+            {carregando
+              ? "A processar..."
+              : modo === "criar"
+                ? "Criar a Minha Conta"
+                : "Acesso ao Painel"}
           </button>
-          <p className="text-[10px] text-center text-white/40 mt-3 font-light">
-            Contacte a secretaria para obter as suas credenciais de acesso.
+          <button
+            type="button"
+            disabled={carregando}
+            onClick={() => {
+              setModo(modo === "criar" ? "entrar" : "criar");
+              setErro("");
+            }}
+            className="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider border border-dourado/40 text-dourado hover:bg-dourado/10 transition-all disabled:opacity-50"
+          >
+            {modo === "criar" ? "Já tenho conta — Entrar" : "Criar Conta"}
+          </button>
+          <p className="text-[10px] text-center text-white/40 mt-1 font-light">
+            {modo === "criar"
+              ? "A conta fica pendente de aprovação pela secretaria."
+              : "Contacte a secretaria para obter as suas credenciais de acesso."}
           </p>
         </div>
       </form>
