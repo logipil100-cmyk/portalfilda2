@@ -1519,7 +1519,7 @@ function ModalLogin({ onClose }: { onClose: () => void }) {
     >
       <form
         onClick={(e) => e.stopPropagation()}
-        onSubmit={submeter}
+        onSubmit={modo === "criar" ? criarConta : submeter}
         className="glass rounded-3xl p-7 w-full max-w-md border border-white/20 shadow-2xl space-y-6 relative text-left"
       >
         <button
@@ -1535,7 +1535,7 @@ function ModalLogin({ onClose }: { onClose: () => void }) {
             <ShieldCheck className="w-6 h-6" />
           </div>
           <h3 className="font-anton text-2xl text-dourado uppercase tracking-wide">
-            Acesso ao Painel
+            {modo === "criar" ? "Criar Conta" : "Acesso ao Painel"}
           </h3>
           <p className="text-xs text-muted-foreground mt-1 font-light">
             FILDA II - Escola de Formação
