@@ -44,7 +44,7 @@ Aplicado ao projeto existente. O design atual (cores, logótipo, fotos, cabeçal
 Início, Sobre, Categorias, Equipas, Treinadores, Notícias, Galeria, Vídeos, Jogos/Resultados, FAQ, Contactos, Pré-inscrição/Criar conta, Entrar — tudo lido da base de dados e editável pelo admin. Sem dados inventados: secções vazias mostram estado vazio.
 
 ## Fase 5 — Testes
-Criar contas de teste para cada perfil e validar: cadastro pendente → aprovação → processo → acesso; atribuição a equipa; mister vê só o seu atleta; presença e avaliação; isolamento entre atletas; bloqueio de acesso indevido (testes de RLS diretamente na base de dados + navegação real).
+Criar contas de teste para cada perfil e validar: cadastro pendente → aprovação → processo → acesso; atribuição a equipa; mister vê só o seu atleta; presença e avaliação; isolamento entre atletas; bloqueio de acesso indevido (testes de RLS diretamente na base de dados + navegação real). Encarregado: código válido/expirado/revogado/reutilizado, pedido pendente sem acesso, acesso após aprovação, dois filhos com seletor, sem acesso a atleta não associado nem a dados médicos/privados, sem permissão de escrita, revogação corta o acesso.
 
 ## Notas
 - O primeiro administrador tem de ser definido: após criar a sua conta, indique o email e atribuo o perfil admin.
