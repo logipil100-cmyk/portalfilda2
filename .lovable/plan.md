@@ -29,11 +29,22 @@ Aplicado ao projeto existente. O design atual (cores, logótipo, fotos, cabeçal
 - Ranking e classificação calculados apenas com dados reais, filtros por categoria/equipa/temporada.
 - Notificações internas em tempo real.
 
+## Fase 3b — Contas de Aluno e Encarregado separadas
+- Aluno tem a sua própria conta e vê apenas os seus dados.
+- Encarregado cria a sua conta: nome, telefone, email, senha, grau de parentesco.
+- Associação por código próprio (não o número de processo): gerado pela secretaria/admin ou pelo atleta depois de aprovado, temporário (validade definida), revogável, de uso único; guardado na base de dados apenas como hash.
+- O encarregado introduz o código no portal → pedido PENDENTE → secretaria/admin vê encarregado, atleta e parentesco e aprova ou rejeita (quem, quando, motivo, auditoria, notificação).
+- Estados da relação: PENDENTE, APROVADA, REJEITADA, REVOGADA; histórico completo e opção de desassociar.
+- Um encarregado pode ter vários atletas (seletor no portal); um atleta pode ter vários encarregados autorizados.
+- Portal do encarregado (só leitura): dados básicos, presenças, avaliações, treinos, jogos, convocatórias, comunicados, notificações, documentos marcados como autorizados, cartão digital. Sem BI, dados médicos, telefone, morada ou documentos privados.
+- RLS: encarregado só lê atletas com relação APROVADA, através de uma vista reduzida; nunca escreve em processo, presenças, avaliações, equipa, categoria ou dados administrativos.
+- Modelo: `guardians`, `athlete_guardians` (status, parentesco, pedido/aprovação/rejeição/revogação com utilizador e data, motivo), `guardian_link_codes` (hash, atleta, validade, usado_em, revogado_em, criado_por).
+
 ## Fase 4 — Site público
 Início, Sobre, Categorias, Equipas, Treinadores, Notícias, Galeria, Vídeos, Jogos/Resultados, FAQ, Contactos, Pré-inscrição/Criar conta, Entrar — tudo lido da base de dados e editável pelo admin. Sem dados inventados: secções vazias mostram estado vazio.
 
 ## Fase 5 — Testes
-Criar contas de teste para cada perfil e validar: cadastro pendente → aprovação → processo → acesso; atribuição a equipa; mister vê só o seu atleta; presença e avaliação; isolamento entre atletas; bloqueio de acesso indevido (testes de RLS diretamente na base de dados + navegação real).
+Criar contas de teste para cada perfil e validar: cadastro pendente → aprovação → processo → acesso; atribuição a equipa; mister vê só o seu atleta; presença e avaliação; isolamento entre atletas; bloqueio de acesso indevido (testes de RLS diretamente na base de dados + navegação real). Encarregado: código válido/expirado/revogado/reutilizado, pedido pendente sem acesso, acesso após aprovação, dois filhos com seletor, sem acesso a atleta não associado nem a dados médicos/privados, sem permissão de escrita, revogação corta o acesso.
 
 ## Notas
 - O primeiro administrador tem de ser definido: após criar a sua conta, indique o email e atribuo o perfil admin.
